@@ -114,6 +114,9 @@ public class GenericAppenderFactory implements FileAppenderFactory<Record> {
               .overwrite()
               .build();
 
+        case LANCE:
+          // TODO LANCE-1: Implement Lance writer
+
         default:
           throw new UnsupportedOperationException(
               "Cannot write unknown file format: " + fileFormat);
@@ -186,6 +189,8 @@ public class GenericAppenderFactory implements FileAppenderFactory<Record> {
               .equalityFieldIds(equalityFieldIds)
               .buildEqualityWriter();
 
+        case NIMBLE:
+          // TODO NIMBLE-1: Implement Nimble delete writer
         default:
           throw new UnsupportedOperationException(
               "Cannot write equality-deletes for unsupported file format: " + format);

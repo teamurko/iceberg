@@ -148,6 +148,9 @@ public abstract class BaseFileWriterFactory<T> implements FileWriterFactory<T> {
 
           return orcBuilder.build();
 
+        case LANCE:
+          // TODO LANCE-1: Implement Lance writer
+
         default:
           throw new UnsupportedOperationException(
               "Unsupported data file format: " + dataFileFormat);

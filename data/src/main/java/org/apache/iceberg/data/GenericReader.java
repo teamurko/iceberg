@@ -27,6 +27,7 @@ import org.apache.iceberg.Schema;
 import org.apache.iceberg.TableScan;
 import org.apache.iceberg.avro.Avro;
 import org.apache.iceberg.data.avro.DataReader;
+import org.apache.iceberg.data.lance.GenericLanceReader;
 import org.apache.iceberg.data.orc.GenericOrcReader;
 import org.apache.iceberg.data.parquet.GenericParquetReaders;
 import org.apache.iceberg.expressions.Evaluator;
@@ -37,6 +38,7 @@ import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
 import org.apache.iceberg.io.FileIO;
 import org.apache.iceberg.io.InputFile;
+import org.apache.iceberg.lance.Lance;
 import org.apache.iceberg.orc.ORC;
 import org.apache.iceberg.parquet.Parquet;
 import org.apache.iceberg.relocated.com.google.common.collect.Iterables;
@@ -141,7 +143,16 @@ class GenericReader implements Serializable {
                 .filter(task.residual());
 
         return orc.build();
-
+      case LANCE:
+        Lance.ReadBuilder lance =
+            Lance.read(input)
+                .project(fileProjection)
+                .createReaderFunc(
+                    fileSchema ->
+                        GenericLanceReader.buildReader(fileProjection, fileSchema, partition))
+                .split(task.start(), task.length())
+                .filter(task.residual());
+        return lance.build();
       default:
         throw new UnsupportedOperationException(
             String.format(
